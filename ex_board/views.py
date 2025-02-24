@@ -1,8 +1,10 @@
-from django.shortcuts import render, reverse, redirect
+from django.shortcuts import render, reverse, redirect, get_object_or_404
 
 # Create your views here.
 from .models import Board
 # from django.urls import 
+from .forms import CreateModelForm
+from django.http import HttpResponse
 
 def boardlist(request):
     objects = Board.objects.order_by("-pk")
@@ -16,7 +18,10 @@ def boarddetail(request, id):
 
 def boardcreate(request):
     if request.method == "GET":
-        return render(request,"ex_board/create.html")
+        form = CreateModelForm()
+        context = {
+                    "form":form }
+        return render(request,"ex_board/create.html", context)
     
     else:
         title = request.POST.get("title")
@@ -26,17 +31,21 @@ def boardcreate(request):
         return redirect(reverse("ex_board:list"))
     
 def boardupdate(request,id):
-    object = Board.objects.get(id=id)
-
+    board = Board.objects.get(pk=id)
+    print(board)
+    # return HttpResponse("테스트")
     if request.method == "GET":
-        return render(request,"ex_board/update.html", {"object":object})
+        form = CreateModelForm(instance=board)
+        context ={"form": form,
+                  "object": board}
+        return render(request,"ex_board/update.html", context)
     
     else:
-        object.title = request.POST["title"]
-        object.author = request.POST["author"]
-        object.content = request.POST["content"]
-        object.save()                                                           
-        return redirect(reverse("ex_board:list"))
+        form = CreateModelForm(request.POST, instance=board)
+        print(form)
+        if form.is_valid():
+            form.save()                            
+            return redirect(reverse("ex_board:detail" , args=(board.id,)))
     
 def boarddelete(request, id):
     object = Board.objects.get(id = id)
