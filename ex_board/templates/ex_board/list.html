@@ -1,0 +1,31 @@
+{% extends 'ex_board/base.html' %}
+{% block title %}게시글 목록{% endblock title %}
+{% block content %}
+    {% if objects %}
+    <table border="1">
+        <tr>
+            <th>글번호</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>내용</th>
+            <th>등록일자</th>
+            <th>조회수</th>
+        </tr>
+        {% for object in objects%}
+        <tr>
+            <td>{{object.id}}</td>
+            <td><a href={% url "ex_board:detail" object.id%}>{{object.title}}</a></td>
+            <td>{{object.author}}</td>
+            <td>{{object.content}}</td>
+            <td>{{object.regdate}}</td>
+            <td>{{object.read_count}}</td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <p>게시글이 존재하지 않습니다.</p>
+    {% endif %}
+
+    </table>
+    <a href={%url "ex_board:create" %}><button>글쓰기</button></a>
+
+    {% endblock content %}
